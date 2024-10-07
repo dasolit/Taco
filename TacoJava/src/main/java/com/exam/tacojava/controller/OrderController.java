@@ -3,6 +3,7 @@ package com.exam.tacojava.controller;
 import com.exam.tacojava.domain.Order;
 import com.exam.tacojava.repository.OrderRepository;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -18,10 +19,10 @@ import org.springframework.web.bind.support.SessionStatus;
 @Controller
 @RequestMapping("/orders")
 @SessionAttributes("order")
+@RequiredArgsConstructor
 public class OrderController {
 
-  @Autowired
-  private OrderRepository orderRepository;
+  private final OrderRepository orderRepository;
 
   @GetMapping("/current")
   public String orderForm(Model model) {
