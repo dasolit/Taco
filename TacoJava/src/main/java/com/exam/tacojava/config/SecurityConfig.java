@@ -2,7 +2,6 @@ package com.exam.tacojava.config;
 
 import static org.springframework.security.config.Customizer.withDefaults;
 
-import javax.sql.DataSource;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -10,15 +9,16 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
-@EnableWebSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-  private final DataSource dataSource;
+  private final UserDetailsService userDetailsService;
 
   @Bean
   public AuthenticationManager authenticationManager(
@@ -28,17 +28,28 @@ public class SecurityConfig {
   }
 
   @Bean
+  public PasswordEncoder encoder() {
+    return new BCryptPasswordEncoder();
+  }
+  @Bean
   public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
     AuthenticationManagerBuilder auth = http.getSharedObject(AuthenticationManagerBuilder.class);
-    auth.jdbcAuthentication().dataSource(dataSource)
-        .usersByUsernameQuery("select username, password, enabled from users where username=?");
+    auth.userDetailsService(userDetailsService).passwordEncoder(encoder());
     http
         .authorizeHttpRequests(au ->
         {
-          au.requestMatchers("/design", "/orders").hasRole("USER");
-          au.requestMatchers("/", "/**").permitAll();
-        }).httpBasic(withDefaults());
+          au
+              .requestMatchers("/design", "/orders").hasRole("USER")
+              .requestMatchers("/", "/**").permitAll();
+        })
+        .formLogin(login ->{
+          login
+              .loginPage("/login")
+              .defaultSuccessUrl("/");
+        })
+        .logout(logout ->{
+          logout.logoutSuccessUrl("/");
+        });
     return http.build();
   }
-
 }

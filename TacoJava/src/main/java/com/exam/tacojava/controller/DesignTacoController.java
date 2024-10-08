@@ -5,9 +5,12 @@ import com.exam.tacojava.domain.Ingredient.Type;
 import com.exam.tacojava.domain.Order;
 import com.exam.tacojava.domain.Taco;
 
+import com.exam.tacojava.domain.User;
 import com.exam.tacojava.repository.IngredientRepository;
 import com.exam.tacojava.repository.TacoRepository;
+import com.exam.tacojava.repository.UserRepository;
 import jakarta.validation.Valid;
+import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -32,6 +35,7 @@ public class DesignTacoController {
 
   private final TacoRepository tacoRepository;
   private final IngredientRepository ingredientRepository;
+  private final UserRepository userRepository;
 
   @ModelAttribute(name = "order")
   public Order order() {
@@ -43,7 +47,10 @@ public class DesignTacoController {
     return new Taco();
   }
   @GetMapping
-  public String showDesignForm(Model model)
+  public String showDesignForm(
+      Model model,
+      Principal principal
+  )
   {
     List<Ingredient> ingredients = new ArrayList<>();
     ingredientRepository.findAll().forEach(ingredients::add);
@@ -54,7 +61,9 @@ public class DesignTacoController {
           filterByType(ingredients, type));
     }
 
-    model.addAttribute("taco", new Taco());
+    String username = principal.getName();
+    User user = userRepository.findByUsername(username);
+    model.addAttribute("user", user);
 
     return "design";
   }

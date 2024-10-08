@@ -4,7 +4,7 @@ drop table if exists ix_auth_username;
 
 create table if not exists users(
     username varchar(50) not null primary key,
-    password varchar(50) not null,
+    password varchar(200) not null,
     enabled char(1) default '1'
 );
 

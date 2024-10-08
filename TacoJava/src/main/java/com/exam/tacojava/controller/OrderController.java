@@ -1,11 +1,12 @@
 package com.exam.tacojava.controller;
 
 import com.exam.tacojava.domain.Order;
+import com.exam.tacojava.domain.User;
 import com.exam.tacojava.repository.OrderRepository;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.Errors;
@@ -31,10 +32,16 @@ public class OrderController {
   }
 
   @PostMapping
-  public String processOrder(@Valid Order order, Errors errors, SessionStatus sessionStatus) {
+  public String processOrder(
+      @Valid Order order, Errors errors,
+      SessionStatus sessionStatus,
+      @AuthenticationPrincipal User user
+  ) {
     if (errors.hasErrors()){
       return "orderForm";
     }
+    order.setUser(user);
+
     orderRepository.save(order);
     sessionStatus.setComplete();
     return "redirect:/";
