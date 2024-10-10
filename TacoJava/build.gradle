@@ -41,6 +41,9 @@ dependencies {
 	implementation("org.springframework.ldap:spring-ldap-core")
 	implementation("org.springframework.security:spring-security-ldap")
 	implementation("com.unboundid:unboundid-ldapsdk")
+
+	implementation group: 'org.springframework.boot', name: 'spring-boot-configuration-processor', version: '3.3.4'
+
 }
 
 tasks.named('test') {
