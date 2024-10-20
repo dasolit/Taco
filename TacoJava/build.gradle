@@ -42,8 +42,20 @@ dependencies {
 	implementation("org.springframework.security:spring-security-ldap")
 	implementation("com.unboundid:unboundid-ldapsdk")
 
+	implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-server'
+
 	implementation group: 'org.springframework.boot', name: 'spring-boot-configuration-processor', version: '3.3.4'
 
+}
+
+ext {
+	set('springCloudVersion', "2023.0.2")
+}
+
+dependencyManagement {
+	imports {
+		mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+	}
 }
 
 tasks.named('test') {
